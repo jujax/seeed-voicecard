@@ -1,0 +1,160 @@
+/dts-v1/;
+
+/ {
+	overlay-name = "ReSpeaker 4 Mic Linear Array";
+	jetson-header-name = "Jetson 40pin Header";
+	compatible = "nvidia,p3768-0000+p3767-0000\0nvidia,p3768-0000+p3767-0001\0nvidia,p3768-0000+p3767-0003\0nvidia,p3768-0000+p3767-0004\0nvidia,p3768-0000+p3767-0005\0nvidia,p3768-0000+p3767-0000-super\0nvidia,p3768-0000+p3767-0001-super\0nvidia,p3768-0000+p3767-0003-super\0nvidia,p3768-0000+p3767-0004-super\0nvidia,p3768-0000+p3767-0005-super\0nvidia,p3509-0000+p3767-0000\0nvidia,p3509-0000+p3767-0001\0nvidia,p3509-0000+p3767-0003\0nvidia,p3509-0000+p3767-0004\0nvidia,p3509-0000+p3767-0005";
+
+	fragment@0 {
+		target = <0xffffffff>;
+
+		__overlay__ {
+			#address-cells = <0x01>;
+			#size-cells = <0x00>;
+
+			ac108@3b {
+				compatible = "x-power,ac108_0";
+				reg = <0x3b>;
+				#sound-dai-cells = <0x00>;
+				data-protocol = <0x00>;
+				status = "okay";
+				sound-name-prefix = "H40-AC";
+				phandle = <0x01>;
+
+				port {
+
+					endpoint {
+						remote-endpoint = <0xffffffff>;
+						link-name = "respeaker-4-mic-array";
+						phandle = <0x03>;
+					};
+				};
+			};
+		};
+	};
+
+	fragment@1 {
+		target = <0xffffffff>;
+
+		__overlay__ {
+			nvidia-audio-card,widgets = "Microphone\0H40-AC Mic";
+			nvidia-audio-card,routing = "H40-AC MIC1N\0H40-AC Mic\0H40-AC MIC1P\0H40-AC Mic\0H40-AC MIC2N\0H40-AC Mic\0H40-AC MIC2P\0H40-AC Mic\0H40-AC MIC3N\0H40-AC Mic\0H40-AC MIC3P\0H40-AC Mic\0H40-AC MIC4N\0H40-AC Mic\0H40-AC MIC4P\0H40-AC Mic\0H40-AC Capture\0H40-AC Mic";
+		};
+	};
+
+	fragment@2 {
+		target = <0xffffffff>;
+
+		__overlay__ {
+			link-name = "respeaker-4-mic-array";
+			format = "dsp_a";
+			fsync-width = <0x00>;
+			bitclock-master;
+			frame-master;
+
+			codec {
+				sound-dai = <0x01>;
+				prefix = "H40-AC";
+			};
+		};
+	};
+
+	fragment@3 {
+		target = <0xffffffff>;
+
+		__overlay__ {
+			pinctrl-names = "default";
+			pinctrl-0 = <0x02>;
+
+			exp-header-pinmux {
+				phandle = <0x02>;
+
+				hdr40-pin12 {
+					nvidia,pins = "soc_gpio41_ph7";
+					nvidia,function = "i2s2";
+					nvidia,pull = <0x01>;
+					nvidia,tristate = <0x00>;
+					nvidia,enable-input = <0x01>;
+				};
+
+				hdr40-pin35 {
+					nvidia,pins = "soc_gpio44_pi2";
+					nvidia,function = "i2s2";
+					nvidia,pull = <0x01>;
+					nvidia,tristate = <0x00>;
+					nvidia,enable-input = <0x01>;
+				};
+
+				hdr40-pin38 {
+					nvidia,pins = "soc_gpio43_pi1";
+					nvidia,function = "i2s2";
+					nvidia,pull = <0x01>;
+					nvidia,tristate = <0x01>;
+					nvidia,enable-input = <0x01>;
+				};
+			};
+		};
+	};
+
+	fragment@4 {
+		target = <0xffffffff>;
+
+		__overlay__ {
+			widgets = "Microphone\0H40-AC Mic";
+			routing = "H40-AC MIC1N\0H40-AC Mic\0H40-AC MIC1P\0H40-AC Mic\0H40-AC MIC2N\0H40-AC Mic\0H40-AC MIC2P\0H40-AC Mic\0H40-AC MIC3N\0H40-AC Mic\0H40-AC MIC3P\0H40-AC Mic\0H40-AC MIC4N\0H40-AC Mic\0H40-AC MIC4P\0H40-AC Mic\0H40-AC Capture\0H40-AC Mic";
+		};
+	};
+
+	fragment@5 {
+		target = <0xffffffff>;
+
+		__overlay__ {
+			dai-format = "dsp_a";
+			bitclock-master;
+			frame-master;
+			remote-endpoint = <0x03>;
+		};
+	};
+
+	__symbols__ {
+		ac108_a = "/fragment@0/__overlay__/ac108@3b";
+		ac108_ep = "/fragment@0/__overlay__/ac108@3b/port/endpoint";
+		jetson_io_pinmux = "/fragment@3/__overlay__/exp-header-pinmux";
+	};
+
+	__fixups__ {
+		hdr40_i2c1 = "/fragment@0:target:0";
+		hdr40_snd_i2s_dap_ep = "/fragment@0/__overlay__/ac108@3b/port/endpoint:remote-endpoint:0\0/fragment@5:target:0";
+		tegra_sound = "/fragment@1:target:0";
+		hdr40_snd_link_i2s = "/fragment@2:target:0";
+		pinmux = "/fragment@3:target:0";
+		tegra_sound_graph = "/fragment@4:target:0";
+	};
+
+	__local_fixups__ {
+
+		fragment@2 {
+
+			__overlay__ {
+
+				codec {
+					sound-dai = <0x00>;
+				};
+			};
+		};
+
+		fragment@3 {
+
+			__overlay__ {
+				pinctrl-0 = <0x00>;
+			};
+		};
+
+		fragment@5 {
+
+			__overlay__ {
+				remote-endpoint = <0x00>;
+			};
+		};
+	};
+};

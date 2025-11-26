@@ -653,7 +653,8 @@ static int ac108_hw_params(struct snd_pcm_substream *substream, struct snd_pcm_h
 
 	dev_dbg(dai->dev, "%s() stream=%s play:%d capt:%d +++\n", __func__,
 			snd_pcm_stream_str(substream),
-			dai->playback_active, dai->capture_active);
+			snd_soc_dai_stream_active(dai, SNDRV_PCM_STREAM_PLAYBACK),
+			snd_soc_dai_stream_active(dai, SNDRV_PCM_STREAM_CAPTURE));
 
 	if (ac10x->i2c101) {
 		ret = ac101_hw_params(substream, params, dai);
@@ -664,8 +665,8 @@ static int ac108_hw_params(struct snd_pcm_substream *substream, struct snd_pcm_h
 		}
 	}
 
-	if ((substream->stream == SNDRV_PCM_STREAM_CAPTURE && dai->playback_active)
-	 || (substream->stream == SNDRV_PCM_STREAM_PLAYBACK && dai->capture_active)) {
+	if ((substream->stream == SNDRV_PCM_STREAM_CAPTURE && snd_soc_dai_stream_active(dai, SNDRV_PCM_STREAM_PLAYBACK))
+	 || (substream->stream == SNDRV_PCM_STREAM_PLAYBACK && snd_soc_dai_stream_active(dai, SNDRV_PCM_STREAM_CAPTURE))) {
 		/* not configure hw_param twice */
 		/* return 0; */
 	}
@@ -870,6 +871,7 @@ static int ac108_set_fmt(struct snd_soc_dai *dai, unsigned int fmt) {
 			/* TODO: Both cpu_dai and codec_dai(AC108) be set as slave in DTS */
 			dev_dbg(dai->dev, "used as slave when AC101 is master\n");
 		}
+		fallthrough;
 	case SND_SOC_DAIFMT_CBS_CFS:    /*AC108 Slave*/
 		dev_dbg(dai->dev, "AC108 set to work as Slave\n");
 		/**
@@ -1127,7 +1129,7 @@ void ac108_aif_shutdown(struct snd_pcm_substream *substream,
 	}
 }
 
-int ac108_aif_mute(struct snd_soc_dai *dai, int mute) {
+int ac108_aif_mute(struct snd_soc_dai *dai, int mute, int direction) {
 	struct snd_soc_codec *codec = dai->codec;
 	struct ac10x_priv *ac10x = snd_soc_codec_get_drvdata(codec);
 
@@ -1148,7 +1150,7 @@ static const struct snd_soc_dai_ops ac108_dai_ops = {
 	.hw_params	= ac108_hw_params,
 	.prepare	= ac108_prepare,
 	.trigger	= ac108_trigger,
-	.digital_mute	= ac108_aif_mute,
+	.mute_stream	= ac108_aif_mute,
 
 	/*DAI format configuration*/
 	.set_fmt	= ac108_set_fmt,

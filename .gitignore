@@ -1,0 +1,28 @@
+# Fichiers objets compilés
+*.o
+
+# Modules kernel compilés
+*.ko
+
+# Fichiers de module kernel
+*.mod
+*.mod.c
+*.mod.o
+
+# Fichiers de build kernel
+*.cmd
+Module.symvers
+modules.order
+
+# Fichiers temporaires
+*~
+*.swp
+*.swo
+.DS_Store
+
+# Fichiers de sauvegarde
+*.bak
+*.backup
+*.orig
+
+
